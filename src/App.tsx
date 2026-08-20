@@ -19,6 +19,10 @@ export default function App() {
       <Route path="/sistema" element={<SystemSalesPage />} />
       <Route path="/privacidade" element={<PrivacyPage />} />
       <Route path="/entrar" element={<LoginPage />} />
+      <Route
+        path="/proprietario/entrar"
+        element={<LoginPage portal="owner" />}
+      />
       <Route path="/recuperar-senha" element={<RecoverPage />} />
       <Route path="/convite" element={<InvitePage />} />
       <Route path="/alterar-senha" element={<ChangePasswordPage />} />
@@ -26,6 +30,10 @@ export default function App() {
         <Route path="/inquilino/*" element={<TenantDashboard />} />
       </Route>
       <Route element={<ProtectedRoute role="admin" />}>
+        <Route
+          path="/proprietario"
+          element={<Navigate to="/admin" replace />}
+        />
         <Route path="/admin/*" element={<AdminDashboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

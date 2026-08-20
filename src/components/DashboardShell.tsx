@@ -22,7 +22,7 @@ export function DashboardShell({ title, subtitle, children, unread = 0 }: { titl
     {open && <button className="sidebar-backdrop" type="button" aria-label="Fechar menu" onClick={() => setOpen(false)} />}
     <aside className={`dashboard-sidebar ${open ? "open" : ""}`}>
       <div className="sidebar-top"><Link to="/" className="brand dashboard-brand"><span className="brand-mark">IO</span><span><strong>Imobiliária Oliveira</strong><small>Gestão de locações</small></span></Link><button type="button" className="sidebar-close" onClick={() => setOpen(false)} aria-label="Fechar menu">×</button></div>
-      <div className="user-chip"><span>{profile?.full_name?.slice(0,1).toUpperCase() ?? "U"}</span><div><strong>{profile?.full_name}</strong><small>{profile?.role === "admin" ? "Administrador" : "Inquilino"}{unread > 0 ? ` • ${unread} novas` : ""}</small></div></div>
+      <div className="user-chip"><span>{profile?.full_name?.slice(0,1).toUpperCase() ?? "U"}</span><div><strong>{profile?.full_name}</strong><small>{profile?.role === "admin" ? "Proprietário" : "Inquilino"}{unread > 0 ? ` • ${unread} novas` : ""}</small></div></div>
       <nav aria-label="Navegação principal">{items.map(([path,icon,label]) => <NavLink key={path} to={path} end={path === "/admin" || path === "/inquilino"} onClick={() => setOpen(false)} className={({isActive}) => isActive ? "active" : ""}><span aria-hidden="true">{icon}</span>{label}</NavLink>)}</nav>
       <div className="sidebar-footer"><Link to="/">Ver site público</Link><button className="sidebar-logout" type="button" onClick={() => void signOut()}>Sair da conta</button></div>
     </aside>

@@ -16,7 +16,9 @@ export function AppHeader() {
         <nav className="main-nav" aria-label="Navegação principal">
           <NavLink to="/" end>Imóveis</NavLink>
           <NavLink to="/sistema">Sistema</NavLink>
-          {profile?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
+          {profile?.role === "admin" && (
+            <NavLink to="/admin">Painel do proprietário</NavLink>
+          )}
           {profile?.role === "tenant" && (
             <NavLink to="/inquilino">Minha locação</NavLink>
           )}
@@ -25,9 +27,12 @@ export function AppHeader() {
               Sair
             </button>
           ) : (
-            <NavLink to="/entrar" className="nav-cta">
-              Área do inquilino
-            </NavLink>
+            <>
+              <NavLink to="/proprietario/entrar">Proprietários</NavLink>
+              <NavLink to="/entrar" className="nav-cta">
+                Área do inquilino
+              </NavLink>
+            </>
           )}
         </nav>
       </div>

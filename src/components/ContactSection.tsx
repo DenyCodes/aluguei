@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../hooks/use-toast";
-import { supabase } from "../integrations/supabase/client";
+import { requireSupabase } from "../lib/supabase";
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -22,7 +22,9 @@ const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.functions.invoke("send-contact-email", {
+      const { error } = await requireSupabase().functions.invoke(
+        "send-contact-email",
+        {
         body: {
           name: formData.name,
           email: formData.email,
@@ -30,7 +32,8 @@ const ContactSection = () => {
           subject: formData.subject || "Contato pelo site",
           message: formData.message,
         },
-      });
+        },
+      );
 
       if (error) throw error;
 

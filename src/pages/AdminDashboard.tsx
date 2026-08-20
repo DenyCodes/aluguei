@@ -913,7 +913,7 @@ export function AdminDashboard() {
             ? selectedProperty.title
             : tab === "leads"
               ? "Leads comerciais"
-              : "Painel administrativo"
+              : "Painel do proprietário"
       }
       subtitle={
         selectedTenant

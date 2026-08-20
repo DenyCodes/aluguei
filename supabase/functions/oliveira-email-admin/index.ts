@@ -24,7 +24,7 @@ serve(async (request) => {
         preheader: "A configuração de e-mail da Imobiliária Oliveira está funcionando.",
         heading: "Configuração validada",
         greeting: "Olá, administrador.",
-        paragraphs: ["testesasasdasdasdas a comunicação entre as Edge Functions, o Resend e o domínio de envio."],
+        paragraphs: ["A comunicação entre as Edge Functions, o Resend e o domínio de envio está funcionando."],
         fields: [{ label: "Remetente", value: "Imobiliária Oliveira" }, { label: "Ambiente", value: "Produção" }],
         ctaLabel: "Abrir painel administrativo",
         ctaUrl: `${Deno.env.get("SITE_URL") ?? "https://imobiliariaoliveira.vercel.app"}/admin`,

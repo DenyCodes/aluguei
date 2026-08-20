@@ -47,12 +47,17 @@ function AuthLayout({
   );
 }
 
-export function LoginPage() {
+export function LoginPage({
+  portal = "tenant",
+}: {
+  portal?: "tenant" | "owner";
+}) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const { profile, mustChangePassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isOwnerPortal = portal === "owner";
   if (profile)
     return (
       <Navigate
@@ -61,7 +66,9 @@ export function LoginPage() {
             ? "/alterar-senha"
             : profile.role === "admin"
               ? "/admin"
-              : "/inquilino"
+              : isOwnerPortal
+                ? "/entrar"
+                : "/inquilino"
         }
         replace
       />
@@ -78,6 +85,23 @@ export function LoginPage() {
           password: String(data.get("password")),
         });
       if (error) throw error;
+      const client = requireSupabase();
+      const { data: signedProfile, error: profileError } = await client
+        .from("oliveira_profiles")
+        .select("role,account_status")
+        .eq("id", authData.user.id)
+        .maybeSingle();
+      if (profileError) throw profileError;
+      if (!signedProfile || signedProfile.account_status !== "active") {
+        await client.auth.signOut();
+        throw new Error("Este cadastro não possui acesso ativo.");
+      }
+      if (isOwnerPortal && signedProfile.role !== "admin") {
+        await client.auth.signOut();
+        throw new Error(
+          "Este acesso é exclusivo para proprietários. Use a área do inquilino.",
+        );
+      }
       if (authData.user.user_metadata?.must_change_password === true) {
         navigate("/alterar-senha", { replace: true });
         return;
@@ -88,7 +112,11 @@ export function LoginPage() {
         } | null
       )?.from;
       navigate(
-        from?.pathname ? `${from.pathname}${from.search ?? ""}` : "/inquilino",
+        from?.pathname
+          ? `${from.pathname}${from.search ?? ""}`
+          : signedProfile.role === "admin"
+            ? "/admin"
+            : "/inquilino",
         { replace: true },
       );
     } catch (error) {
@@ -101,8 +129,12 @@ export function LoginPage() {
   };
   return (
     <AuthLayout
-      title="Entrar"
-      subtitle="Use o e-mail que recebeu o convite da Imobiliária Oliveira."
+      title={isOwnerPortal ? "Acesso do proprietário" : "Área do inquilino"}
+      subtitle={
+        isOwnerPortal
+          ? "Entre com sua conta autorizada para administrar imóveis, locações e recebimentos."
+          : "Use o e-mail que recebeu o convite da Imobiliária Oliveira."
+      }
     >
       <form className="stack-form" onSubmit={submit}>
         <label>
@@ -127,6 +159,11 @@ export function LoginPage() {
           {busy ? "Entrando..." : "Entrar com segurança"}
         </button>
         <Link to="/recuperar-senha">Esqueci minha senha</Link>
+        <Link to={isOwnerPortal ? "/entrar" : "/proprietario/entrar"}>
+          {isOwnerPortal
+            ? "Ir para a área do inquilino"
+            : "Sou proprietário"}
+        </Link>
       </form>
     </AuthLayout>
   );
