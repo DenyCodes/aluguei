@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdminTenantsPage } from "./pages/AdminTenantsPage";
 import {
   ChangePasswordPage,
   InvitePage,
@@ -34,6 +35,7 @@ export default function App() {
           path="/proprietario"
           element={<Navigate to="/admin" replace />}
         />
+        <Route path="/admin/inquilinos" element={<AdminTenantsPage />} />
         <Route path="/admin/*" element={<AdminDashboard />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
