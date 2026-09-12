@@ -16,7 +16,7 @@ serve(async (request) => {
 
   const { data: installments, error } = await client
     .from("oliveira_rent_installments")
-    .select("*, tenancy:oliveira_tenancies(id,tenant_id,property:oliveira_properties(title,address),tenant:oliveira_profiles(email,full_name))")
+    .select("*, tenancy:oliveira_tenancies(id,tenant_id,property:oliveira_properties(title,address),tenant:oliveira_profiles!oliveira_tenancies_tenant_id_fkey(email,full_name))")
     .eq("due_date", today)
     .in("status", ["upcoming", "pending", "rejected"]);
   if (error) throw error;
@@ -49,6 +49,7 @@ serve(async (request) => {
       tenancyId: tenancy.id,
       installmentId: installment.id,
       idempotencyKey: rentDueIdempotencyKey(installment.id, today),
+      adminCopy: true,
       template: {
         preheader: `Seu aluguel de ${installment.reference_month} vence hoje.`,
         heading: "Seu aluguel vence hoje",
