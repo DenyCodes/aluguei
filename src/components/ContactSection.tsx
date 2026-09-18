@@ -46,7 +46,7 @@ const ContactSection = () => {
     };
   }, []);
 
-  const updateField = <K extends keyof typeof form>(
+  const updateField = <K extends keyof typeof form,>(
     field: K,
     value: (typeof form)[K],
   ) => {
@@ -116,7 +116,7 @@ const ContactSection = () => {
       aria-labelledby="system-contact-title"
     >
       <div className="shell system-contact-grid">
-        <div className="system-contact-copy">
+        <div>
           <span className="eyebrow light">Solicite uma proposta</span>
           <h2 id="system-contact-title">
             Conte como sua operação funciona. A tecnologia entra depois.
@@ -134,27 +134,37 @@ const ContactSection = () => {
             <li>Dados usados somente para responder à solicitação comercial.</li>
           </ul>
 
-          <div className="system-contact-channels">
-            <a href="mailto:playtecno@outlook.com.br">
-              <span className="system-contact-channel-icon">
-                <Mail aria-hidden="true" />
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+            <a
+              className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] p-4 text-white no-underline transition hover:bg-white/[0.1]"
+              href="mailto:playtecno@outlook.com.br"
+            >
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/10">
+                <Mail className="h-4 w-4" aria-hidden="true" />
               </span>
-              <span>
-                <small>E-mail</small>
-                <strong>playtecno@outlook.com.br</strong>
+              <span className="min-w-0">
+                <small className="block text-[0.65rem] uppercase tracking-[0.08em] text-white/55">
+                  E-mail
+                </small>
+                <strong className="block truncate text-sm">
+                  playtecno@outlook.com.br
+                </strong>
               </span>
             </a>
             <a
+              className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] p-4 text-white no-underline transition hover:bg-white/[0.1]"
               href="https://wa.me/5521993450137"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="system-contact-channel-icon">
-                <MessageCircle aria-hidden="true" />
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/10">
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
               </span>
               <span>
-                <small>WhatsApp</small>
-                <strong>(21) 99345-0137</strong>
+                <small className="block text-[0.65rem] uppercase tracking-[0.08em] text-white/55">
+                  WhatsApp
+                </small>
+                <strong className="block text-sm">(21) 99345-0137</strong>
               </span>
             </a>
           </div>
@@ -164,7 +174,7 @@ const ContactSection = () => {
           <div className="system-form-heading">
             <span>Orçamento identificado</span>
             <strong>Vamos desenhar a implantação certa?</strong>
-            <p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">
               Preencha os dados abaixo. O pedido é registrado com segurança e a
               confirmação é enviada automaticamente por e-mail.
             </p>
@@ -245,29 +255,32 @@ const ContactSection = () => {
 
           <button
             type="submit"
-            className="system-button primary system-form-submit"
+            className="system-button primary gap-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="system-form-spinner" aria-hidden="true" />
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 Registrando solicitação
               </>
             ) : (
               <>
                 Solicitar diagnóstico
-                <ArrowRight aria-hidden="true" />
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </>
             )}
           </button>
 
-          <div className="system-form-assurance" aria-label="Segurança do envio">
-            <span>
-              <ShieldCheck aria-hidden="true" />
+          <div
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[0.68rem] font-semibold text-slate-500"
+            aria-label="Segurança do envio"
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Envio protegido
             </span>
-            <span>
-              <CheckCircle2 aria-hidden="true" />
+            <span className="inline-flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
               Confirmação por e-mail
             </span>
           </div>
