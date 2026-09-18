@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 import { invokeSecure } from "../lib/supabase";
+import "./ContactSection.css";
 
 type ContactResponse = {
   success?: boolean;
@@ -58,7 +59,6 @@ const ContactSection = () => {
     event.preventDefault();
     setFeedback(null);
 
-    // Honeypot: bots costumam preencher campos invisíveis.
     if (form.website.trim()) {
       setFeedback({
         type: "success",
@@ -144,37 +144,32 @@ const ContactSection = () => {
             <li>Dados usados somente para responder à solicitação comercial.</li>
           </ul>
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          <div className="system-contact-channels">
             <a
-              className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] p-4 text-white no-underline transition hover:bg-white/[0.1]"
+              className="system-contact-channel"
               href="mailto:playtecno@outlook.com.br"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/10">
-                <Mail className="h-4 w-4" aria-hidden="true" />
+              <span className="system-contact-channel-icon">
+                <Mail aria-hidden="true" />
               </span>
-              <span className="min-w-0">
-                <small className="block text-[0.65rem] uppercase tracking-[0.08em] text-white/55">
-                  E-mail
-                </small>
-                <strong className="block truncate text-sm">
-                  playtecno@outlook.com.br
-                </strong>
+              <span className="system-contact-channel-copy">
+                <small>E-mail</small>
+                <strong>playtecno@outlook.com.br</strong>
               </span>
             </a>
+
             <a
-              className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/[0.06] p-4 text-white no-underline transition hover:bg-white/[0.1]"
+              className="system-contact-channel"
               href="https://wa.me/5521993450137"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/10">
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              <span className="system-contact-channel-icon">
+                <MessageCircle aria-hidden="true" />
               </span>
-              <span>
-                <small className="block text-[0.65rem] uppercase tracking-[0.08em] text-white/55">
-                  WhatsApp
-                </small>
-                <strong className="block text-sm">(21) 99345-0137</strong>
+              <span className="system-contact-channel-copy">
+                <small>WhatsApp</small>
+                <strong>(21) 99345-0137</strong>
               </span>
             </a>
           </div>
@@ -184,7 +179,7 @@ const ContactSection = () => {
           <div className="system-form-heading">
             <span>Orçamento identificado</span>
             <strong>Vamos desenhar a implantação certa?</strong>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            <p className="system-form-subtitle">
               Preencha os dados abaixo para receber um contato com os próximos
               passos e uma proposta adequada ao seu cenário.
             </p>
@@ -265,7 +260,7 @@ const ContactSection = () => {
               <label htmlFor="commercial-message">Contexto do projeto *</label>
               <textarea
                 id="commercial-message"
-                className="system-field min-h-32 resize-y"
+                className="system-field system-textarea"
                 value={form.message}
                 onChange={(event) => updateField("message", event.target.value)}
                 placeholder="Conte quantos imóveis administra, como funciona hoje e o que você gostaria de automatizar."
@@ -303,32 +298,32 @@ const ContactSection = () => {
 
           <button
             type="submit"
-            className="system-button primary gap-2"
+            className="system-button primary"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <Loader2 className="system-form-spinner" aria-hidden="true" />
                 Enviando solicitação
               </>
             ) : (
               <>
                 Solicitar diagnóstico
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <ArrowRight aria-hidden="true" />
               </>
             )}
           </button>
 
           <div
-            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[0.68rem] font-semibold text-slate-500"
+            className="system-form-security"
             aria-label="Segurança do envio"
           >
-            <span className="inline-flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>
+              <ShieldCheck aria-hidden="true" />
               Envio protegido
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+            <span>
+              <CheckCircle2 aria-hidden="true" />
               Confirmação por e-mail
             </span>
           </div>
