@@ -10,10 +10,9 @@ import {
 import { useToast } from "../hooks/use-toast";
 import { invokeSecure } from "../lib/supabase";
 
-type LeadResponse = {
-  accepted?: boolean;
-  duplicate?: boolean;
-  confirmation_sent?: boolean;
+type ContactResponse = {
+  success?: boolean;
+  message?: string;
 };
 
 type Feedback = {
@@ -21,28 +20,30 @@ type Feedback = {
   message: string;
 } | null;
 
-const createSubmissionId = () => crypto.randomUUID();
+const initialForm = {
+  name: "",
+  email: "",
+  phone: "",
+  company: "",
+  segment: "",
+  message: "",
+  website: "",
+  consent: false,
+};
 
 const ContactSection = () => {
   const { toast } = useToast();
+  const [form, setForm] = useState(initialForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
-  const [submissionId, setSubmissionId] = useState(createSubmissionId);
-  const [startedAt, setStartedAt] = useState(() => Date.now());
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    consent: false,
-    website: "",
-  });
 
   const attribution = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return {
-      utm_source: params.get("utm_source"),
-      utm_medium: params.get("utm_medium"),
-      utm_campaign: params.get("utm_campaign"),
+      sourcePath: window.location.pathname,
+      utmSource: params.get("utm_source"),
+      utmMedium: params.get("utm_medium"),
+      utmCampaign: params.get("utm_campaign"),
     };
   }, []);
 
@@ -56,48 +57,57 @@ const ContactSection = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFeedback(null);
+
+    // Honeypot: bots costumam preencher campos invisíveis.
+    if (form.website.trim()) {
+      setFeedback({
+        type: "success",
+        message: "Solicitação recebida. Entraremos em contato em breve.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const result = await invokeSecure<LeadResponse>("oliveira-commercial-lead", {
-        submission_id: submissionId,
-        full_name: form.fullName,
+      const context = [
+        form.message.trim(),
+        "",
+        `Empresa: ${form.company.trim() || "Não informada"}`,
+        `Segmento: ${form.segment.trim() || "Não informado"}`,
+        `Origem: ${attribution.sourcePath}`,
+        attribution.utmSource ? `UTM source: ${attribution.utmSource}` : "",
+        attribution.utmMedium ? `UTM medium: ${attribution.utmMedium}` : "",
+        attribution.utmCampaign ? `UTM campaign: ${attribution.utmCampaign}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
+
+      await invokeSecure<ContactResponse>("send-contact-email", {
+        name: form.name,
         email: form.email,
         phone: form.phone,
-        consent: form.consent,
-        website: form.website,
-        started_at: startedAt,
-        ...attribution,
+        subject: "Sistema de gestão de locações — solicitação de diagnóstico",
+        message: context,
+        brand: "playtecno",
       });
 
-      const message = result?.duplicate
-        ? "Sua solicitação já tinha sido registrada. Não é necessário enviar novamente."
-        : "Pedido recebido. Enviamos uma confirmação por e-mail e entraremos em contato para entender sua operação.";
+      const successMessage =
+        "Sua solicitação foi enviada. Você receberá uma confirmação por e-mail e entraremos em contato para entender sua operação.";
 
-      setFeedback({ type: "success", message });
+      setFeedback({ type: "success", message: successMessage });
       toast({
-        title: result?.duplicate ? "Solicitação já registrada" : "Diagnóstico solicitado",
-        description: message,
+        title: "Diagnóstico solicitado",
+        description: successMessage,
       });
-
-      if (!result?.duplicate) {
-        setForm({
-          fullName: "",
-          email: "",
-          phone: "",
-          consent: false,
-          website: "",
-        });
-        setSubmissionId(createSubmissionId());
-        setStartedAt(Date.now());
-      }
+      setForm(initialForm);
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
           : "Não foi possível enviar agora. Tente novamente ou fale conosco pelo WhatsApp.";
 
-      console.error("Commercial lead error", error);
+      console.error("Commercial contact error", error);
       setFeedback({ type: "error", message });
       toast({
         title: "Não foi possível enviar",
@@ -175,21 +185,22 @@ const ContactSection = () => {
             <span>Orçamento identificado</span>
             <strong>Vamos desenhar a implantação certa?</strong>
             <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              Preencha os dados abaixo. O pedido é registrado com segurança e a
-              confirmação é enviada automaticamente por e-mail.
+              O mesmo fluxo comercial da PlayTecno: a solicitação segue por
+              Supabase Function e você recebe a confirmação automaticamente por
+              e-mail.
             </p>
           </div>
 
           <div className="system-form-grid">
-            <div className="system-form-field system-form-field-full">
-              <label htmlFor="commercial-full-name">Nome completo *</label>
+            <div className="system-form-field">
+              <label htmlFor="commercial-name">Nome *</label>
               <input
-                id="commercial-full-name"
+                id="commercial-name"
                 className="system-field"
                 autoComplete="name"
-                value={form.fullName}
-                onChange={(event) => updateField("fullName", event.target.value)}
-                placeholder="Seu nome e sobrenome"
+                value={form.name}
+                onChange={(event) => updateField("name", event.target.value)}
+                placeholder="Seu nome"
                 minLength={2}
                 maxLength={100}
                 required
@@ -206,13 +217,13 @@ const ContactSection = () => {
                 value={form.email}
                 onChange={(event) => updateField("email", event.target.value)}
                 placeholder="voce@empresa.com.br"
-                maxLength={254}
+                maxLength={180}
                 required
               />
             </div>
 
             <div className="system-form-field">
-              <label htmlFor="commercial-phone">WhatsApp / telefone *</label>
+              <label htmlFor="commercial-phone">Telefone</label>
               <input
                 id="commercial-phone"
                 className="system-field"
@@ -223,6 +234,44 @@ const ContactSection = () => {
                 onChange={(event) => updateField("phone", event.target.value)}
                 placeholder="(21) 99999-9999"
                 maxLength={30}
+              />
+            </div>
+
+            <div className="system-form-field">
+              <label htmlFor="commercial-company">Empresa / imobiliária</label>
+              <input
+                id="commercial-company"
+                className="system-field"
+                autoComplete="organization"
+                value={form.company}
+                onChange={(event) => updateField("company", event.target.value)}
+                placeholder="Nome da operação"
+                maxLength={120}
+              />
+            </div>
+
+            <div className="system-form-field system-form-field-full">
+              <label htmlFor="commercial-segment">Segmento</label>
+              <input
+                id="commercial-segment"
+                className="system-field"
+                value={form.segment}
+                onChange={(event) => updateField("segment", event.target.value)}
+                placeholder="Ex.: imobiliária, administradora, locador independente"
+                maxLength={100}
+              />
+            </div>
+
+            <div className="system-form-field system-form-field-full">
+              <label htmlFor="commercial-message">Contexto do projeto *</label>
+              <textarea
+                id="commercial-message"
+                className="system-field min-h-32 resize-y"
+                value={form.message}
+                onChange={(event) => updateField("message", event.target.value)}
+                placeholder="Conte quantos imóveis administra, como funciona hoje e o que você gostaria de automatizar."
+                minLength={10}
+                maxLength={3000}
                 required
               />
             </div>
@@ -261,7 +310,7 @@ const ContactSection = () => {
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Registrando solicitação
+                Enviando solicitação
               </>
             ) : (
               <>
@@ -277,11 +326,11 @@ const ContactSection = () => {
           >
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              Envio protegido
+              Supabase Function
             </span>
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-              Confirmação por e-mail
+              Confirmação via Resend
             </span>
           </div>
 
