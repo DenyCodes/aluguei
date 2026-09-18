@@ -185,9 +185,8 @@ const ContactSection = () => {
             <span>Orçamento identificado</span>
             <strong>Vamos desenhar a implantação certa?</strong>
             <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              O mesmo fluxo comercial da PlayTecno: a solicitação segue por
-              Supabase Function e você recebe a confirmação automaticamente por
-              e-mail.
+              Preencha os dados abaixo para receber um contato com os próximos
+              passos e uma proposta adequada ao seu cenário.
             </p>
           </div>
 
@@ -326,11 +325,11 @@ const ContactSection = () => {
           >
             <span className="inline-flex items-center gap-1.5">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-              Supabase Function
+              Envio protegido
             </span>
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-              Confirmação via Resend
+              Confirmação por e-mail
             </span>
           </div>
 
